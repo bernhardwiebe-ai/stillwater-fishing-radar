@@ -1,0 +1,38 @@
+.pond-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 190px;
+}
+.pond-picker span {
+  color: var(--muted);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 1.1px;
+  text-transform: uppercase;
+}
+.pond-picker select {
+  appearance: none;
+  width: 100%;
+  padding: 10px 32px 10px 12px;
+  color: var(--ink);
+  background-color: #17312a;
+  background-image: linear-gradient(45deg, transparent 50%, var(--lime) 50%), linear-gradient(135deg, var(--lime) 50%, transparent 50%);
+  background-position: calc(100% - 15px) 50%, calc(100% - 10px) 50%;
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  border: 1px solid var(--line);
+  border-radius: 11px;
+  outline: none;
+  font-size: 12px;
+  font-weight: 700;
+}
+@media (max-width: 850px) {
+  .pond-picker { min-width: 150px; }
+}
+@media (max-width: 620px) {
+  .map-toolbar { align-items: stretch; flex-direction: column; }
+  .map-actions { display: grid; grid-template-columns: 1fr auto; width: 100%; }
+  .pond-picker { grid-column: 1 / -1; }
+  .pond-picker select { width: 100%; }
+}

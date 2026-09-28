@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#071713" />
+  <meta name="description" content="Freshwater fishing forecasts, bite windows and evidence-informed lure plans for the United States and Mexico." />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="icon" href="icons/stillwater-icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/stillwater-icon.svg" />
+  <title>Stillwater — Fishing Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="cast-plan.css" />
+  <link rel="stylesheet" href="pond-picker.css" />
+  <link rel="stylesheet" href="fish-guide.css" />
+  <link rel="stylesheet" href="lure-grid.css" />
+  <link rel="stylesheet" href="map-search.css" />
+  <link rel="stylesheet" href="lure-periods.css" />
+  <link rel="stylesheet" href="product.css" />
+</head>
+<body>
+  <a class="skip-link" href="#main-content">Skip to fishing forecast</a>
+  <div id="network-status" class="network-status" role="status" aria-live="polite"></div>
+  <div class="shell">
+    <header class="topbar">
+      <a class="brand" href="#" aria-label="Stillwater home">
+        <span class="brand-mark">S</span>
+        <span>Stillwater</span>
+      </a>
+      <div class="location-pill"><span class="pulse"></span><span id="active-location">Choose a pond</span></div>
+      <div class="header-actions">
+        <button class="header-control" id="unit-toggle" aria-label="Change measurement units">°F / mph</button>
+        <button class="header-control" id="theme-toggle" aria-label="Toggle light and dark theme">☼</button>
+        <button class="header-control install-button hidden" id="install-button">Install</button>
+      </div>
+    </header>
+
+    <main id="main-content">
+      <section class="hero">
+        <div>
+          <p class="eyebrow">FISHING INTELLIGENCE</p>
+          <h1>Know when they'll bite.</h1>
+          <p class="lede">Drop a pin on any pond. We’ll read the sky, pressure, wind and water signals to find your best window.</p>
+        </div>
+        <div class="hero-score" id="hero-score">
+          <span class="score-label">TODAY'S OUTLOOK</span>
+          <strong>—</strong>
+          <span>Select a location</span>
+        </div>
+      </section>
+
+      <section class="map-card">
+        <div class="map-toolbar">
+          <div class="map-title"><span class="map-icon">⌖</span><div><strong>Select your water</strong><small>Click the map or drag the pin for pond-level precision</small></div></div>
+          <div class="map-actions">
+            <label class="pond-picker" for="saved-ponds">
+              <span>Saved ponds</span>
+              <select id="saved-ponds" aria-label="Saved ponds">
+                <option value="">Select a saved pond</option>
+              </select>
+            </label>
+            <button class="ghost" id="locate-btn">◎ Use my location</button>
+            <button class="primary" id="save-btn" disabled>＋ Save pond</button>
+          </div>
+        </div>
+        <div class="map-wrap">
+          <div id="map"></div>
+          <div class="map-search">
+            <label for="place-input">Search the map</label>
+            <div class="search-row"><input id="place-input" placeholder="City, lake, park or place name" autocomplete="off" /><button id="place-btn">Search</button></div>
+            <div class="place-results hidden" id="place-results" role="listbox" aria-label="Map search results"></div>
+            <div class="coordinate-row"><input id="coordinate-input" placeholder="Or enter coordinates: 28.6329, -106.0691" /><button id="coordinate-btn">Go</button></div>
+          </div>
+          <div class="map-hint" id="map-hint">Click directly on your pond</div>
+        </div>
+        <div class="selection-bar">
+          <div><span>SELECTED POINT</span><strong id="coordinates">No location selected</strong></div>
+          <div><span>FORECAST GRID</span><strong id="grid-label">Waiting for pin</strong></div>
+          <div><span>DATA QUALITY</span><strong id="data-quality">—</strong></div>
+          <button id="analyze-btn" class="analyze" disabled>Analyze this spot <span>→</span></button>
+        </div>
+      </section>
+
+      <section id="dashboard" class="dashboard hidden">
+        <section class="today-plan" id="today-plan" aria-labelledby="today-plan-title">
+          <div><p class="eyebrow">TODAY'S FISHING PLAN</p><h2 id="today-plan-title">Your fastest path to a bite</h2></div>
+          <div class="today-plan-grid" id="today-plan-grid"></div>
+          <p class="data-note">Weather values are model forecasts from Open-Meteo. Activity, confidence, water temperature, and lure rankings are computed fishing estimates—not measurements or guarantees.</p>
+        </section>
+        <div class="section-heading">
+          <div><p class="eyebrow">TODAY AT YOUR PIN</p><h2 id="forecast-title">Fishing forecast</h2></div>
+          <div class="updated" id="updated-at">Live forecast</div>
+        </div>
+
+        <div class="species-grid" id="species-grid"></div>
+        <article class="fish-guide" id="fish-guide"></article>
+
+        <div class="content-grid">
+          <article class="panel timeline-panel">
+            <div class="panel-head"><div><p class="eyebrow">BITE TIMELINE</p><h3>Best hours today</h3></div><div class="legend"><i></i> Activity score</div></div>
+            <div class="best-window" id="best-window"></div>
+            <div class="chart-wrap"><canvas id="bite-chart" width="900" height="280"></canvas></div>
+            <div class="chart-labels" id="chart-labels"></div>
+          </article>
+
+          <article class="panel conditions-panel">
+            <div class="panel-head"><div><p class="eyebrow">CONDITIONS</p><h3>What’s driving it</h3></div></div>
+            <div class="conditions" id="conditions"></div>
+            <p class="why" id="why-text"></p>
+          </article>
+        </div>
+
+        <section class="forecast-section">
+          <div class="section-heading compact"><div><p class="eyebrow">7-DAY OUTLOOK</p><h2>Plan your next trip</h2></div></div>
+          <div class="day-strip" id="day-strip"></div>
+        </section>
+
+        <section class="lure-section">
+          <div class="section-heading compact"><div><p class="eyebrow">TACTICAL PICKS</p><h2 id="lure-title">What to throw today</h2></div><span class="species-tag" id="tactics-species">BASS</span></div>
+          <div class="cast-plan" id="cast-plan"></div>
+          <div class="lure-periods">
+            <section class="lure-period am-period">
+              <div class="period-heading"><div><span>AM PLAN</span><h3>Morning selections</h3></div><p id="am-conditions">Calculating morning peak…</p></div>
+              <div class="lure-grid" id="am-lure-grid"></div>
+            </section>
+            <section class="lure-period pm-period">
+              <div class="period-heading"><div><span>PM PLAN</span><h3>Afternoon & evening selections</h3></div><p id="pm-conditions">Calculating evening peak…</p></div>
+              <div class="lure-grid" id="pm-lure-grid"></div>
+            </section>
+          </div>
+        </section>
+      </section>
+    </main>
+    <footer><span>STILLWATER</span><p>Recommendations are evidence-informed predictions, not guarantees. Check local regulations and use your safety judgment.</p><span>WEATHER: OPEN-METEO · MAP: OPENSTREETMAP</span></footer>
+  </div>
+
+  <dialog id="save-dialog">
+    <form method="dialog">
+      <button class="dialog-close" value="cancel">×</button>
+      <p class="eyebrow">SAVE LOCATION</p><h2>Name this pond</h2>
+      <p>Saved privately in this browser for quick access later.</p>
+      <input id="pond-name" placeholder="e.g. North pasture pond" maxlength="48" autofocus />
+      <div class="dialog-actions"><button value="cancel" class="ghost">Cancel</button><button value="default" id="confirm-save" class="primary">Save pond</button></div>
+    </form>
+  </dialog>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
+  <script src="pwa.js"></script>
+  <script src="scoring-core.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

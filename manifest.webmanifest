@@ -1,0 +1,14 @@
+{
+  "name": "Stillwater Fishing Radar",
+  "short_name": "Stillwater",
+  "description": "Freshwater fishing forecasts, bite windows and lure plans.",
+  "start_url": "./FishingRadar.html",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#06120f",
+  "theme_color": "#071713",
+  "orientation": "any",
+  "icons": [
+    {"src": "icons/stillwater-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable"}
+  ]
+}

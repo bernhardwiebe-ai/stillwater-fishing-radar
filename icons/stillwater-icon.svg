@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Stillwater fish and water mark">
+  <rect width="512" height="512" rx="112" fill="#071713"/>
+  <path d="M94 208c77-92 196-92 274 0l56-43-8 83 8 83-56-43c-78 92-197 92-274 0 42-14 68-40 78-80-10-39-36-66-78-80z" fill="#c7f464"/>
+  <circle cx="316" cy="196" r="12" fill="#071713"/>
+  <path d="M82 363c92-32 182-32 272 0 31 11 58 11 82 0" fill="none" stroke="#45d398" stroke-width="24" stroke-linecap="round"/>
+</svg>

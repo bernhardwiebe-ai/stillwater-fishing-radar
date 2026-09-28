@@ -1,0 +1,14 @@
+.DS_Store
+node_modules/
+.pnpm-store/
+.env
+.env.*
+!.env.example
+dist/
+coverage/
+*.log
+cell-city-lab/
+Icon
+**/Icon
+Icon?
+**/Icon?

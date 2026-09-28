@@ -1,0 +1,24 @@
+.cast-plan {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 14px;
+  align-items: center;
+  margin-bottom: 14px;
+  padding: 17px 20px;
+  background: linear-gradient(100deg, rgba(69, 211, 152, .12), rgba(199, 244, 100, .04));
+  border: 1px solid rgba(69, 211, 152, .25);
+  border-radius: 16px;
+}
+.cast-plan-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  background: #17372d;
+  color: var(--lime);
+  font-size: 21px;
+}
+.cast-plan span { display: block; color: var(--green); font: 800 9px var(--display); letter-spacing: 1.3px; margin-bottom: 4px; }
+.cast-plan strong { display: block; font: 700 15px var(--display); margin-bottom: 3px; }
+.cast-plan p { color: var(--muted); font-size: 11px; line-height: 1.5; margin: 0; }

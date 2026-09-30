@@ -24,10 +24,12 @@
 .lure-card > p:first-of-type {
   flex: 1;
 }
+.lure-carousel-controls{display:none}
 @media (max-width: 1000px) {
   .lure-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 620px) {
   .lure-grid { grid-template-columns: 1fr; }
   .lure-card { min-height: 0; }
+  .lure-carousel-controls{display:flex;align-items:center;justify-content:space-between;margin:10px 0 12px;color:var(--muted);font-size:10px;font-weight:700;letter-spacing:.3px}.lure-carousel-controls>div{display:flex;gap:7px}.lure-carousel-controls button{display:grid;place-items:center;width:44px;height:40px;min-height:40px;border:1px solid var(--line);border-radius:10px;background:#17312a;color:var(--lime);font-size:20px;font-weight:800}.lure-carousel-controls button:active{background:var(--lime);color:#071713}
 }

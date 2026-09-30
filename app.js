@@ -170,7 +170,7 @@ async function searchPlaces(){
     const url=`https://nominatim.openstreetmap.org/search?format=jsonv2&addressdetails=1&limit=6&q=${encodeURIComponent(query)}`;
     const places=await fetchJson(url,{timeout:7000,retries:1});
     if(!places.length){results.innerHTML='<p class="result-status">No matching places found. Try a nearby city or a broader name.</p>';return}
-    results.innerHTML=places.map((place,index)=>`<button type="button" class="place-result" data-index="${index}" role="option"><strong>${escapeText(place.name||place.display_name.split(',')[0])}</strong><span>${escapeText(place.display_name)}</span></button>`).join('');
+    results.innerHTML=places.map((place,index)=>{const primary=place.name||place.display_name.split(',')[0],parts=place.display_name.split(',').map(part=>part.trim()),context=parts.filter((part,i)=>i>0&&part.toLowerCase()!==String(primary).toLowerCase()).slice(0,4).join(', '),kind=String(place.type||place.addresstype||'place').replaceAll('_',' ');return`<button type="button" class="place-result" data-index="${index}" role="option" aria-label="${escapeText(primary)}, ${escapeText(context)}"><strong>${escapeText(primary)}</strong><span>${escapeText(context||place.display_name)}</span><small>${escapeText(kind)}</small></button>`}).join('');
     results.querySelectorAll('.place-result').forEach(item=>item.onclick=()=>{
       const place=places[Number(item.dataset.index)],lat=Number(place.lat),lng=Number(place.lon);
       selectPoint(lat,lng,true);$('active-location').textContent=place.name||place.display_name.split(',')[0];

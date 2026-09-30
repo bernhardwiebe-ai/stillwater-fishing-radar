@@ -38,7 +38,7 @@
       <div class="header-actions">
         <button class="header-control" id="unit-toggle" aria-label="Change measurement units">°F / mph</button>
         <button class="header-control" id="theme-toggle" aria-label="Toggle light and dark theme">☼</button>
-        <button class="header-control install-button hidden" id="install-button">Install</button>
+        <button class="header-control install-button" id="install-button">Install app</button>
       </div>
     </header>
 
@@ -134,13 +134,15 @@
           <div class="lure-periods">
             <section class="lure-period am-period">
               <div class="period-heading"><div><span>AM PLAN</span><h3>Morning selections</h3></div><p id="am-conditions">Calculating morning peak…</p></div>
-              <div class="lure-carousel-controls" aria-label="Morning lure navigation"><span id="am-lure-position">1 of 6 · Swipe or use arrows</span><div><button type="button" data-carousel="am" data-direction="-1" aria-label="Previous morning lure">←</button><button type="button" data-carousel="am" data-direction="1" aria-label="Next morning lure">→</button></div></div>
-              <div class="lure-grid" id="am-lure-grid"></div>
+              <button type="button" class="lure-menu-toggle" id="am-lure-menu-toggle" aria-expanded="false" aria-controls="am-lure-menu"><span>Choose an AM lure</span><strong id="am-lure-choice">Show all recommendations</strong><b>⌄</b></button>
+              <div class="lure-menu hidden" id="am-lure-menu" role="listbox" aria-label="Morning lure recommendations"></div>
+              <div class="lure-selected" id="am-lure-grid"></div>
             </section>
             <section class="lure-period pm-period">
               <div class="period-heading"><div><span>PM PLAN</span><h3>Afternoon & evening selections</h3></div><p id="pm-conditions">Calculating evening peak…</p></div>
-              <div class="lure-carousel-controls" aria-label="Afternoon lure navigation"><span id="pm-lure-position">1 of 6 · Swipe or use arrows</span><div><button type="button" data-carousel="pm" data-direction="-1" aria-label="Previous afternoon lure">←</button><button type="button" data-carousel="pm" data-direction="1" aria-label="Next afternoon lure">→</button></div></div>
-              <div class="lure-grid" id="pm-lure-grid"></div>
+              <button type="button" class="lure-menu-toggle" id="pm-lure-menu-toggle" aria-expanded="false" aria-controls="pm-lure-menu"><span>Choose a PM lure</span><strong id="pm-lure-choice">Show all recommendations</strong><b>⌄</b></button>
+              <div class="lure-menu hidden" id="pm-lure-menu" role="listbox" aria-label="Afternoon and evening lure recommendations"></div>
+              <div class="lure-selected" id="pm-lure-grid"></div>
             </section>
           </div>
         </section>

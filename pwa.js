@@ -4,8 +4,11 @@
   let installPrompt=null;
   const updateNetwork=()=>{const offline=!navigator.onLine;document.documentElement.classList.toggle('is-offline',offline);networkStatus.textContent=offline?'Offline — showing saved and cached information':'';networkStatus.classList.toggle('visible',offline)};
   window.addEventListener('online',updateNetwork);window.addEventListener('offline',updateNetwork);updateNetwork();
-  window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;installButton?.classList.remove('hidden')});
-  installButton?.addEventListener('click',async()=>{if(!installPrompt)return;installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;installButton.classList.add('hidden')});
+  const standalone=()=>window.matchMedia('(display-mode: standalone)').matches||window.navigator.standalone===true;
+  if(standalone()){installButton.textContent='Installed';installButton.disabled=true}
+  window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();installPrompt=event;installButton.textContent='Install app'});
+  window.addEventListener('appinstalled',()=>{installPrompt=null;installButton.textContent='Installed';installButton.disabled=true});
+  installButton?.addEventListener('click',async()=>{if(installPrompt){installPrompt.prompt();await installPrompt.userChoice;installPrompt=null;return}networkStatus.innerHTML='To install on Android: open Chrome’s ⋮ menu, then tap <b>Install app</b> or <b>Add to Home screen</b>. <button id="install-help-close">OK</button>';networkStatus.classList.add('visible');document.getElementById('install-help-close')?.addEventListener('click',()=>networkStatus.classList.remove('visible'))});
   if('serviceWorker'in navigator){
     window.addEventListener('load',()=>{
       navigator.serviceWorker.register('./service-worker.js').then(registration=>{

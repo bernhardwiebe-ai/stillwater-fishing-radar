@@ -81,6 +81,36 @@ const lureLibrary=[
   {name:'Punch rig',color:'Black/blue creature bait',depth:'1–8 ft',retrieve:'Punch mat; shake then lift',traits:['sun','warm','bottom'],why:'Penetrates overhead vegetation where bass hide during heat and sun.'}
 ];
 
+const lureSheets=['assets/lures/bass-soft-rigs.png','assets/lures/bass-jigs-cranks.png','assets/lures/bass-topwater-swimbaits.png'];
+function lureArt(index){
+  const sheet=Math.floor(index/10),cell=index%10,col=cell%5,row=Math.floor(cell/5);
+  return{url:lureSheets[sheet],position:`${col*25}% ${row*100}%`};
+}
+function techniqueFor(lure){
+  const text=lure.retrieve.toLowerCase();
+  if(/walk|wake|surface|pop/.test(text))return{motion:'topwater',seconds:3,cadence:'3 sec rhythm',move:'Work the surface',steps:['Cast beyond the target and let the rings settle.','Keep the rod tip slightly down and add slack between short pulls.','Pause beside shade, grass openings, wood, or any visible disturbance.']};
+  if(/fall|sink|dead-stick|pause/.test(text))return{motion:'fall',seconds:5,cadence:'5 sec pause',move:'Let it fall freely',steps:['Cast tight to the target and follow the bait on semi-slack line.','Count it down for about five seconds without pulling it forward.','Lift gently, watch the line, then repeat the controlled fall.']};
+  if(/hop|drag|bottom|punch|shake|sweep/.test(text))return{motion:'hop',seconds:4,cadence:'4 sec pause',move:'Contact bottom',steps:['Let the lure reach bottom and keep the line lightly tensioned.','Move it with one short lift or a slow rod sweep.','Reel only the slack, pause, and feel before making the next move.']};
+  if(/twitch|jerk|glide|yo-yo|rip/.test(text))return{motion:'twitch',seconds:3,cadence:'2–3 sec pause',move:'Twitch, then glide',steps:['Point the rod toward the lure and begin with controlled slack.','Snap the tip once or twice, then stop completely.','Let the lure glide or suspend before repeating with varied timing.']};
+  return{motion:'steady',seconds:3,cadence:'Steady retrieve',move:'Track one depth',steps:['Cast past the target and let the lure reach the listed depth.','Retrieve just fast enough to keep its action working.','Touch cover when possible; pause briefly after every deflection.']};
+}
+let techniqueInterval=null,techniqueRemaining=0,techniquePaused=false,currentTechnique=null;
+function setTechniqueTimer(technique){
+  clearInterval(techniqueInterval);currentTechnique=technique;techniqueRemaining=technique.seconds;techniquePaused=false;
+  $('technique-timer').textContent=techniqueRemaining;$('timer-toggle').textContent='Pause timer';$('technique-stage').classList.remove('paused');
+  techniqueInterval=setInterval(()=>{if(techniquePaused)return;techniqueRemaining=techniqueRemaining<=1?technique.seconds:techniqueRemaining-1;$('technique-timer').textContent=techniqueRemaining},1000);
+}
+function openLureGuide(index,rankLabel,reason){
+  const lure=lureLibrary[index],art=lureArt(index),technique=techniqueFor(lure);if(!lure)return;
+  $('lure-detail-art').style.backgroundImage=`url('${art.url}')`;$('lure-detail-art').style.backgroundPosition=art.position;
+  $('demo-lure').style.backgroundImage=`url('${art.url}')`;$('demo-lure').style.backgroundPosition=art.position;
+  $('lure-detail-name').textContent=lure.name;$('lure-detail-rank').textContent=rankLabel;$('lure-detail-why').textContent=reason||lure.why;
+  $('technique-stage').dataset.motion=technique.motion;$('technique-stage').style.setProperty('--cycle',`${technique.seconds}s`);
+  $('technique-cadence').textContent=technique.cadence;$('technique-depth').textContent=lure.depth;$('technique-move').textContent=lure.retrieve;
+  $('technique-steps').innerHTML=technique.steps.map(step=>`<li>${step}</li>`).join('');
+  $('lure-dialog').showModal();setTechniqueTimer(technique);
+}
+
 function bassPredictionReason(lure,w){
   const reasons=[];const t=lure.traits;
   if(t.includes('wind')&&w.wind>=7)reasons.push(`${formatWind(w.wind)} wind adds chop and pushes forage toward the active bank`);
@@ -259,7 +289,8 @@ function renderLurePeriod(period,context){
   const w=context.conditions;
   const ranked=state.species==='bass'?[...lureLibrary].map(lure=>({...lure,match:Math.round(clamp(scoreBassLure(lure,w),0,100)),predictionWhy:bassPredictionReason(lure,w)})).sort((a,b)=>b.match-a.match).slice(0,6):baitLibraries[state.species].map((bait,i)=>({...bait,match:Math.round(clamp(context.score-i*4,0,100)),predictionWhy:baitPeriodReason(bait,w,period)}));
   $(`${period}-conditions`).textContent=periodWeatherSummary(context);
-  $(`${period}-lure-grid`).innerHTML=ranked.map((l,i)=>`<article class="lure-card"><span class="lure-rank">#${i+1} ${i===0?'BEST '+period.toUpperCase()+' FIT':'RANKED PICK'} · ${fitBand(l.match).toUpperCase()}</span><h3>${l.name}</h3><p>${l.predictionWhy||l.why}</p><p><strong>Presentation:</strong> ${l.retrieve}</p><div class="lure-meta"><span>${l.color}</span><span>${l.depth}</span><span>Best near ${fmtHour(w.hour)}</span></div></article>`).join('');
+  $(`${period}-lure-grid`).innerHTML=ranked.map((l,i)=>{const libraryIndex=state.species==='bass'?lureLibrary.findIndex(item=>item.name===l.name):-1,art=libraryIndex>=0?lureArt(libraryIndex):null,rankLabel=`#${i+1} ${i===0?'BEST '+period.toUpperCase()+' FIT':'RANKED PICK'} · ${fitBand(l.match).toUpperCase()}`;return`<article class="lure-card"><div class="lure-card-main">${art?`<div class="lure-visual" role="img" aria-label="Accurate illustration of ${escapeText(l.name)}" style="background-image:url('${art.url}');background-position:${art.position}"></div>`:''}<span class="lure-rank">${rankLabel}</span><h3>${l.name}</h3><p>${l.predictionWhy||l.why}</p><p><strong>Presentation:</strong> ${l.retrieve}</p><div class="lure-meta"><span>${l.color}</span><span>${l.depth}</span><span>Best near ${fmtHour(w.hour)}</span></div>${libraryIndex>=0?`<button class="lure-guide-button" type="button" data-lure-index="${libraryIndex}" data-rank="${escapeText(rankLabel)}">See animated technique →</button>`:''}</div></article>`}).join('');
+  $(`${period}-lure-grid`).querySelectorAll('.lure-guide-button').forEach(button=>button.onclick=()=>{const lure=lureLibrary[Number(button.dataset.lureIndex)],rankedLure=ranked.find(item=>item.name===lure.name);openLureGuide(Number(button.dataset.lureIndex),button.dataset.rank,rankedLure?.predictionWhy)});
 }
 function renderTodayPlan(){
   const scores=scoresForDay(state.day,state.species),hours=dayHours(state.day);let best=0;for(let i=1;i<scores.length;i++)if(scores[i]>scores[best])best=i;
@@ -290,20 +321,26 @@ $('coordinate-input').addEventListener('keydown',e=>{if(e.key==='Enter')$('coord
 $('place-btn').onclick=searchPlaces;
 $('place-input').addEventListener('keydown',e=>{if(e.key==='Enter')searchPlaces()});
 document.addEventListener('click',e=>{if(!e.target.closest('.map-search'))$('place-results').classList.add('hidden')});
-$('save-btn').onclick=()=>$('save-dialog').showModal();
-$('confirm-save').onclick=e=>{
-  const name=$('pond-name').value.trim();if(!name){e.preventDefault();return}
+$('save-btn').onclick=()=>{if(!state.point)return;$('save-dialog').showModal();requestAnimationFrame(()=>$('pond-name').focus())};
+$('cancel-save').onclick=()=>{$('pond-name').value='';$('save-dialog').close()};
+document.querySelector('.save-dialog-close').onclick=()=>{$('pond-name').value='';$('save-dialog').close()};
+$('save-dialog').querySelector('form').onsubmit=e=>{
+  e.preventDefault();const name=$('pond-name').value.trim();if(!name){$('pond-name').focus();return}
   const ponds=getSavedPonds();
   const existing=ponds.findIndex(p=>p.name.toLowerCase()===name.toLowerCase());
   const saved={name,...state.point};
   if(existing>=0)ponds[existing]=saved;else ponds.push(saved);
   savePonds(ponds);
   const selected=existing>=0?existing:ponds.length-1;
-  $('active-location').textContent=name;$('pond-name').value='';renderSavedPonds(selected);
+  $('active-location').textContent=name;$('pond-name').value='';renderSavedPonds(selected);$('save-dialog').close();showNotice(`${name} saved on this device.`);
 };
 $('saved-ponds').onchange=e=>{if(e.target.value!=='')openSavedPond(e.target.value)};
 window.addEventListener('resize',()=>state.weather&&renderTimeline());
 function applyPreferences(){document.documentElement.dataset.theme=preferences.theme;$('theme-toggle').textContent=preferences.theme==='dark'?'☼':'☾';$('unit-toggle').textContent=preferences.units==='imperial'?'°F / mph':'°C / km/h';localStorage.setItem('stillwater-preferences',JSON.stringify({...preferences,version:STORAGE_VERSION}))}
 $('theme-toggle').onclick=()=>{preferences.theme=preferences.theme==='dark'?'light':'dark';applyPreferences()};
 $('unit-toggle').onclick=()=>{preferences.units=preferences.units==='imperial'?'metric':'imperial';applyPreferences();if(state.weather)renderDashboard()};
+$('lure-dialog').addEventListener('close',()=>clearInterval(techniqueInterval));
+document.querySelector('.lure-close').onclick=()=>$('lure-dialog').close();
+$('replay-technique').onclick=()=>{const lure=$('demo-lure');lure.style.animation='none';void lure.offsetWidth;lure.style.animation='';setTechniqueTimer(currentTechnique)};
+$('timer-toggle').onclick=()=>{techniquePaused=!techniquePaused;$('technique-stage').classList.toggle('paused',techniquePaused);$('timer-toggle').textContent=techniquePaused?'Resume timer':'Pause timer'};
 applyPreferences();initMap();renderSavedPonds();

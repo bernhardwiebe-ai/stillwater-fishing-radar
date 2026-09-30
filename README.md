@@ -2,6 +2,8 @@
 
 Stillwater is a mobile-first freshwater fishing companion for the United States and Mexico. It combines point weather forecasts with transparent, evidence-informed rules to suggest bite windows, casting zones, and presentations for bass, carp, catfish, and bluegill.
 
+The mobile interface uses a full-width pond map, device-local saved waters, horizontally scrollable forecast/lure collections, original lure artwork, and interactive retrieval guides with animated lure paths and cadence timers.
+
 Recommendations are planning aids—not biological surveys, safety advice, or guarantees of catches. The app does not claim a species is present at a selected water.
 
 ## Run locally

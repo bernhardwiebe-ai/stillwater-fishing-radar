@@ -72,7 +72,9 @@
         </div>
         <div class="map-wrap">
           <div id="map"></div>
-          <div class="map-search">
+          <button type="button" class="map-search-toggle" id="map-search-toggle" aria-expanded="false" aria-controls="map-search-panel">⌕<span>Search</span></button>
+          <div class="map-search" id="map-search-panel">
+            <button type="button" class="map-search-close" id="map-search-close" aria-label="Close map search">×</button>
             <label for="place-input">Search the map</label>
             <div class="search-row"><input id="place-input" placeholder="City, lake, park or place name" autocomplete="off" /><button id="place-btn">Search</button></div>
             <div class="place-results hidden" id="place-results" role="listbox" aria-label="Map search results"></div>
@@ -113,6 +115,10 @@
           <article class="panel conditions-panel">
             <div class="panel-head"><div><p class="eyebrow">CONDITIONS</p><h3>What’s driving it</h3></div></div>
             <div class="conditions" id="conditions"></div>
+            <form class="water-temp-control" id="water-temp-form">
+              <div><label for="water-temp-input">Known water temperature</label><small>Optional pond reading—improves activity and lure estimates.</small></div>
+              <div class="water-temp-entry"><input id="water-temp-input" type="number" inputmode="decimal" min="32" max="100" step="1" placeholder="72" aria-label="Water temperature" /><span id="water-temp-unit">°F</span><button class="primary" type="submit">Apply</button><button class="ghost hidden" type="button" id="clear-water-temp">Clear</button></div>
+            </form>
             <p class="why" id="why-text"></p>
           </article>
         </div>
@@ -158,6 +164,7 @@
         <div class="lure-detail-art" id="lure-detail-art" aria-hidden="true"></div>
         <div><p class="eyebrow" id="lure-detail-rank">LURE GUIDE</p><h2 id="lure-detail-name">Presentation guide</h2><p id="lure-detail-why"></p></div>
       </div>
+      <div class="technique-picker" id="technique-picker" role="tablist" aria-label="Presentation techniques"></div>
       <div class="technique-stage" id="technique-stage">
         <div class="sky-line"></div><div class="water-line"></div><div class="pond-bottom"></div>
         <div class="angler" aria-hidden="true"><i class="angler-head"></i><i class="angler-body"></i><i class="angler-arm"></i><i class="angler-rod"></i><i class="angler-line"></i></div>
